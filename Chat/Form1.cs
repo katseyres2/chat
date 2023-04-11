@@ -107,6 +107,7 @@ namespace Chat
                     button4.Text = "Sign Out";
                     if (username.CompareTo("admin") == 0) EnableAdmin();
                     displayServerMessage(null, $"Signed as {username}.");
+                    addRooms();
                 }
 
                 Console.WriteLine("End signin");
@@ -126,6 +127,66 @@ namespace Chat
                 clearInputs();
                 DisableConfigurationPanel();
                 EnableAuthenticationForm();
+                removeRooms();
+            }
+        }
+
+        private void removeRooms()
+        {
+            foreach (TabPage tb in tabControl1.TabPages)
+            {
+                if (tb.Name == "private") continue;
+                tabControl1.TabPages.Remove(tb);
+            }
+        }
+
+        private void addRooms()
+        {
+            TabPage tabPage;
+            string response = client.Send("/showrooms");
+
+            string[] args = response.Split(' ');
+            if (args.Length < 1) Console.WriteLine(ErrorMessage.Error);
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                ListViewItem li = new ListViewItem(new string[] {"17:00:01","max","Hello !"}, -1);
+
+                ColumnHeader newHour = new ColumnHeader();
+                newHour.Text = "Hour";
+                ColumnHeader newUser = new ColumnHeader();
+                user.Text = "User";
+                user.Width = 100;
+                ColumnHeader newMessage = new ColumnHeader();
+                message.Text = "Message";
+                message.Width = 577;
+
+                System.Windows.Forms.ListView lv = new System.Windows.Forms.ListView();
+                lv.Activation = ItemActivation.OneClick;
+                lv.Alignment = ListViewAlignment.SnapToGrid;
+                lv.AutoArrange = false;
+                lv.BorderStyle = BorderStyle.None;
+                lv.Columns.AddRange(new ColumnHeader[] {newHour,newUser,newMessage});
+                lv.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+                lv.HideSelection = false;
+                lv.HoverSelection = true;
+                lv.Items.AddRange(new ListViewItem[] {li});
+                lv.Location = new Point(-4, 0);
+                lv.MultiSelect = false;
+                lv.ShowGroups = false;
+                lv.Size = new Size(753, 464);
+                lv.TabIndex = tabControl1.TabCount + 1;
+                lv.UseCompatibleStateImageBehavior = false;
+                lv.View = View.Details;
+                //lv.SelectedIndexChanged += new EventHandler((object sender, EventArgs e) => {
+                //    Console.WriteLine(tabControl1.);
+                //});
+
+                Console.WriteLine(args[i]);
+                tabPage = new TabPage();
+                tabPage.Text = args[i];
+                tabControl1.Controls.Add(tabPage);
+                tabPage.Controls.Add(lv);
             }
         }
 
@@ -356,6 +417,13 @@ namespace Chat
             string password = textBox11.Text;
 
             if (username.Length != 0 && password.Length != 0) client.Send($"/setpassword {username} {password}");
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TabControl control = (TabControl) sender;
+            Console.WriteLine(control.SelectedIndex + ", " + control.SelectedTab.Name);
+
         }
     }
 }

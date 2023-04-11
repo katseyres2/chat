@@ -23,6 +23,7 @@ namespace Server
         public const string NameAlreadyExists       = TcpStatus.Error + " NameAlreadyExists";
         public const string AlreadySigned           = TcpStatus.Error + " AlreadySigned";
         public const string RoomNotJoined           = TcpStatus.Error + " RoomNotJoined";
+        public const string RoomAccessDenied        = TcpStatus.Error + " RoomAccessDenied";
         public const string Error                   = TcpStatus.Error + " Error";
         public const string NotConnected            = TcpStatus.Error + " NotConnected";
         public const string PermissionDenied        = TcpStatus.Error + " PermissionDenied";
@@ -38,8 +39,9 @@ namespace Server
         public Server() {
             users.Add(new User("admin", "1234"));
             users.Add(new User("max", "1234"));
-            chatRooms.Add(new ChatRoom("default", users[0]));
-            chatRooms.Add(new ChatRoom("summer", users[0]));
+            chatRooms.Add(new ChatRoom("spring", users[0]));
+            chatRooms.Add(new ChatRoom("winter", users[0]));
+            chatRooms.Add(new ChatRoom("summer", users[1]));
 
             TcpListener server = new TcpListener(IPAddress.Parse(LocalHost), LocalPort);
 			server.Start();
@@ -191,6 +193,8 @@ namespace Server
 
             string name = args[1];
 
+            if (!Regex.Match(name, "/b^[0-9a-zA-Z]*$/b").Success) return ErrorMessage.InvalidParameter;
+
             FindRoomByName(name, ref room);
             if (room != null) return ErrorMessage.NameAlreadyExists;            
 
@@ -204,30 +208,29 @@ namespace Server
             return TcpStatus.Success;
         }
 
-        //public string ShowRooms(TcpClient cli, string message)
-        //{
-        //    string output = "";
-        //    User? user = null;
+        public string ShowRooms(TcpClient cli, string message)
+        {
+            string output;
+            User? user = null;
 
-        //    string[] args = message.Trim().Split(' ');
-        //    if (args.Length != 1) output = ErrorMessage.InvalidParameter;
+            string[] args = message.Trim().Split(' ');
+            if (args.Length != 1) return ErrorMessage.InvalidParameter;
 
-        //    FindUserByTcp(cli, ref user);
-            
-        //    if (user == null) return "No user.";
+            FindUserByTcp(cli, ref user);
+            if (user == null) return ErrorMessage.UserNotFound;
 
-        //    output = "ChatRooms\n";
-            
-        //    foreach (ChatRoom r in chatRooms)
-        //    {
-        //        if (r.HasUser(user))
-        //        {
-        //            output += $"- {r}\n";
-        //        }
-        //    }
+            output = TcpStatus.Success;
 
-        //    return output;
-        //}
+            foreach (ChatRoom r in chatRooms)
+            {
+                if (r.HasUser(user))
+                {
+                    output += $" {r.Name}";
+                }
+            }
+
+            return output;
+        }
 
         //public static string Delete(TcpClient cli, Server server, string message)
         //{
@@ -257,26 +260,23 @@ namespace Server
         {
             User? user = null;
             string[] args = message.Trim().Split(' ');
-            if (args.Length != 2) return "Invalid arguments.";
+            if (args.Length != 2) return ErrorMessage.InvalidParameter;
             string roomName = args[1];
-            string output = "You can't join this room.";
-
             FindUserByTcp(cli, ref user);
 
-            if (user == null) return "No user.";
+            if (user == null) return ErrorMessage.UserNotFound;
 
             foreach (ChatRoom cr in chatRooms)
             {
                 if (cr.Name.CompareTo(roomName) == 0 && cr.HasUser(user))
                 {
                     user.SwitchRoom(cr);
-                    output = $"You joined the room \"{cr.Name}\".";
                     cr.Broadcast();
                     break;
                 }
             }
 
-            return output;
+            return TcpStatus.Success;
         }
 
         /// <summary>

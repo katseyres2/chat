@@ -32,7 +32,7 @@ namespace Chat
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
             "17:00:01",
             "max",
             "Hello !"}, -1);
@@ -51,6 +51,8 @@ namespace Chat
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.hour = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.user = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.message = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -89,8 +91,6 @@ namespace Chat
             this.button7 = new System.Windows.Forms.Button();
             this.textBox7 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.user = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.hour = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -222,7 +222,8 @@ namespace Chat
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(753, 486);
-            this.tabControl1.TabIndex = 16;
+            this.tabControl1.TabIndex = 1;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage2
             // 
@@ -232,7 +233,7 @@ namespace Chat
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(745, 460);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Private";
+            this.tabPage2.Text = "private";
             this.tabPage2.UseVisualStyleBackColor = true;
             this.tabPage2.Click += new System.EventHandler(this.tabPage2_Click);
             // 
@@ -250,7 +251,7 @@ namespace Chat
             this.listView1.HideSelection = false;
             this.listView1.HoverSelection = true;
             this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem3});
             this.listView1.Location = new System.Drawing.Point(-4, 0);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
@@ -260,6 +261,15 @@ namespace Chat
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
+            // 
+            // hour
+            // 
+            this.hour.Text = "Hour";
+            // 
+            // user
+            // 
+            this.user.Text = "User";
+            this.user.Width = 100;
             // 
             // message
             // 
@@ -672,19 +682,9 @@ namespace Chat
             this.label13.TabIndex = 2;
             this.label13.Text = "Local port";
             // 
-            // user
-            // 
-            this.user.Text = "User";
-            this.user.Width = 100;
-            // 
-            // hour
-            // 
-            this.hour.Text = "Hour";
-            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1260, 581);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.splitContainer1);
