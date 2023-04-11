@@ -1,0 +1,11 @@
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.csproj.AssemblyReference.cache
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.csproj.SuggestedBindingRedirects.cache
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.Properties.Resources.resources
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.csproj.GenerateResource.cache
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.csproj.CoreCompileInputs.cache
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\bin\Debug\Chat.exe.config
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\bin\Debug\Chat.exe
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\bin\Debug\Chat.pdb
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.exe
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.pdb
+C:\Users\Maximilien\Nextcloud3\documents\ecole\2022_2023_esa\0870_programmation_oriente_objet\csharp\Chat\Chat\obj\Debug\Chat.Form1.resources
