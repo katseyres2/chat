@@ -1,10 +1,15 @@
-﻿namespace Server
+﻿using System.Reflection;
+
+namespace Server
 {
     internal static class Program
     {
         static void Main()
         {
-            Server s = new Server();
+            Models.Server s = new Models.Server(Models.Server.LOCAL_HOST, Models.Server.LOCAL_PORT);
+            s.populateCommands();
+            s.populateData();
+            s.run();
         }
     }
 }

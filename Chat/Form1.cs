@@ -17,6 +17,7 @@ namespace Chat
     {
         readonly Client client;
         public static List<string> remoteMessageQueue = new List<string> { };
+        public static string SUCCESS_RESPONSE = "/";
 
         public Form1()
         {
@@ -37,16 +38,26 @@ namespace Chat
                 index = remoteMessageQueue.Count - 1;
                 message = remoteMessageQueue[index];
 
-                if (message.Contains("allusercounter")) updateAllUserCounter(int.Parse(message.Split(' ')[3]));
-                else if (message.Contains("connectedusercounter")) updateConnectedUserCounter(int.Parse(message.Split(' ')[3]));
-                else
-                {
-                    // "/notification user Hello World !
-                    parameters = message.Split(' ');
-                    username = parameters[1];
-                    message = message.Replace(username, "").Replace("/notification", "").Trim();
-                    displayServerMessage(username, message);
-                }
+                Console.WriteLine($"IN : {message}");
+
+                //if (message.Contains("allusercounter")) updateAllUserCounter(int.Parse(message.Split(' ')[3]));
+                //else if (message.Contains("connectedusercounter")) updateConnectedUserCounter(int.Parse(message.Split(' ')[3]));
+                //else
+                //{
+                //    string[] args = message.Split(' ');
+                //    string roomName = args[2];
+
+                //    foreach (TabPage tab in tabControl1.TabPages)
+                //    {
+                //        //if (tab.Name == )
+                //    }
+
+                //    // "/notification user Hello World !
+                //    parameters = message.Split(' ');
+                //    username = parameters[1];
+                //    message = message.Replace(username, "").Replace("/notification", "").Trim();
+                //    displayServerMessage(username, message);
+                //}
 
                 remoteMessageQueue.RemoveAt(remoteMessageQueue.Count - 1);
             }
@@ -88,17 +99,15 @@ namespace Chat
             if (button4.Text.ToLower().CompareTo("sign in") == 0)
             {
                 Console.WriteLine("Start signin");
-                // start the client listener before sending to server
-                // that he can open a new TCP client to create the bound
+                // start the client listener before sending to server that he can open a new TCP client to create the bound
                 client.StartListen(localPort);
                 Console.WriteLine($"Listen on {localPort}");
                 // then send credentials with the port the client is listening with.
                 message = $"/signin {username} {password} {localPort}";
                 response = client.Send(message);
-                Console.WriteLine($"Sent {message}");
                 label12.Text = response;
 
-                if (response ==  TcpStatus.Success)
+                if (response == SUCCESS_RESPONSE)
                 {
                     label7.Text = username;
                     EnableUser();
@@ -107,7 +116,7 @@ namespace Chat
                     button4.Text = "Sign Out";
                     if (username.CompareTo("admin") == 0) EnableAdmin();
                     displayServerMessage(null, $"Signed as {username}.");
-                    addRooms();
+                    FetchRooms();
                 }
 
                 Console.WriteLine("End signin");
@@ -116,18 +125,18 @@ namespace Chat
             {
                 // send to the server that he can stop its TcpClient for the local listener
                 response = client.Send($"/signout");
-                // then stop the local listener
+                //then stop the local listener
                 client.StopListen();
-                
+
                 label12.Text = response;
                 displayServerMessage(null, "Signed out.");
                 button4.Text = "Sign in";
                 label7.Text = "";
-                
+
                 clearInputs();
                 DisableConfigurationPanel();
                 EnableAuthenticationForm();
-                removeRooms();
+                //removeRooms();
             }
         }
 
@@ -140,13 +149,12 @@ namespace Chat
             }
         }
 
-        private void addRooms()
+        private void FetchRooms()
         {
             TabPage tabPage;
-            string response = client.Send("/showrooms");
+            string response = client.Send("/roomlist");
 
             string[] args = response.Split(' ');
-            if (args.Length < 1) Console.WriteLine(ErrorMessage.Error);
 
             for (int i = 1; i < args.Length; i++)
             {
@@ -185,6 +193,7 @@ namespace Chat
                 Console.WriteLine(args[i]);
                 tabPage = new TabPage();
                 tabPage.Text = args[i];
+                tabPage.Name = args[i];
                 tabControl1.Controls.Add(tabPage);
                 tabPage.Controls.Add(lv);
             }
@@ -276,12 +285,9 @@ namespace Chat
                 DisableConnectionForm();
             }
             else
-            {
-                // you must send to server to close the notification bound
-                client.Send("/unbindclient");
+            {                
                 // then you can close the client
                 client.Disconnect();
-                
                 displayServerMessage(null, "Disconnected.");
                 EnableConnectionForm();
             }
@@ -334,6 +340,7 @@ namespace Chat
         }
 
         private void button2_MouseDown(object sender, MouseEventArgs e)
+
         {
             string msg = textBox3.Text;
 
@@ -341,14 +348,13 @@ namespace Chat
             {
                 textBox3.Text = "";
                 msg = msg.TrimStart('/');
-                client.Send(msg);
-                displayServerMessage("you",msg);
+                client.Send($"/messagetochannel {tabControl1.SelectedTab.Name} {msg}");
             }
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            Console.WriteLine(listView1.TabIndex);
         }
 
         private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
@@ -361,7 +367,8 @@ namespace Chat
 
         private void button7_Click(object sender, EventArgs e)
         {
-            if (client.Send("/ping") == TcpStatus.Success) displayServerMessage(null,"Pong !");
+            client.Ping();
+            //if (client.Ping() == SUCCESS_RESPONSE) displayServerMessage(null,"Pong !");
         }
 
         public void displayServerMessage(string username, string msg)
@@ -398,9 +405,7 @@ namespace Chat
             }
 
             response = client.Send($"/newuser {username} {password}");
-
-            if (response == TcpStatus.Success) displayServerMessage(null,$"User {username} created.");
-            else if (response == ErrorMessage.UserAlreadyExists) displayServerMessage(null,$"User {username} already exists.");
+            displayServerMessage(null,response);
         }
 
         private void clearInputs()
@@ -422,8 +427,13 @@ namespace Chat
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             TabControl control = (TabControl) sender;
-            Console.WriteLine(control.SelectedIndex + ", " + control.SelectedTab.Name);
+            Console.WriteLine($"changed : {control.SelectedIndex}, {control.SelectedTab.Name}");
+            //Console.WriteLine(control.SelectedIndex + ", " + control.SelectedTab.Name);
+        }
 
+        private void tabControl1_TabIndexChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine($"TabIndex changed {tabControl1.TabIndex}, {tabControl1.SelectedIndex}");
         }
     }
 }

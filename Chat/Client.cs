@@ -6,38 +6,13 @@ using System.Threading;
 
 namespace Chat
 {
-    public static class TcpStatus
-    {
-        public const string Success = "/success";
-        public const string Error = "/error";
-        public const string Notification = "/notification";
-    }
-
-    public static class ErrorMessage
-    {
-        public const string UserAlreadyExists = TcpStatus.Error + " UserAlreadyExists";
-        public const string UserNotFound = TcpStatus.Error + " UserNotFound";
-        public const string GuestNotFound = TcpStatus.Error + " GuestNotFound";
-        public const string WrongCredentials = TcpStatus.Error + " WrongCredentials";
-        public const string InvalidParameter = TcpStatus.Error + " InvalidParameter";
-        public const string NameAlreadyExists = TcpStatus.Error + " NameAlreadyExists";
-        public const string AlreadySigned = TcpStatus.Error + " AlreadySigned";
-        public const string RoomNotJoined = TcpStatus.Error + " RoomNotJoined";
-        public const string Error = TcpStatus.Error + " Error";
-        public const string NotConnected = TcpStatus.Error + " NotConnected";
-        public const string PermissionDenied = TcpStatus.Error + " PermissionDenied";
-    }
-
     public class Client
     {
         TcpClient client;
         TcpListener listener;
         Thread listenerThread;
-        //Thread clientThread;
-        //bool clientIsRunning = false;
-        //Form1 form;
 
-        private const string LocalHost = "0.0.0.0";
+        private const string HOST = "0.0.0.0";
 
         public Client() {}
 
@@ -48,9 +23,15 @@ namespace Chat
 
         public void Disconnect()
         {
+            Send("/disconnect");
             client.GetStream().Close();
             client.Close();
             client = null;
+        }
+
+        public void Ping()
+        {
+            Send("/ping");
         }
 
         public void StartListen(int port)
@@ -62,7 +43,7 @@ namespace Chat
                 byte[] bytes = new byte[2048];
                 string message;
 
-                listener = new TcpListener(IPAddress.Parse(LocalHost), port);
+                listener = new TcpListener(IPAddress.Parse(HOST), port);
                 listener.Start();
 
                 TcpClient cli = listener.AcceptTcpClient();
@@ -83,12 +64,14 @@ namespace Chat
         public void StopListen()
         {
             listener.Stop();
+            Console.WriteLine(listenerThread.ThreadState);
             listenerThread.Abort();
             listener = null;
         }
 
         public string Send(string message)
         {
+            Console.WriteLine($"SEND : {message}");
             if (client != null)
             {
                 Console.WriteLine(1);
@@ -98,12 +81,69 @@ namespace Chat
                 data = new byte[2048];
                 int bytes = client.GetStream().Read(data, 0, data.Length);
                 Console.WriteLine(3);
-                return Encoding.ASCII.GetString(data, 0, bytes);
+                string response = Encoding.ASCII.GetString(data, 0, bytes);
+                Console.WriteLine($"RESPONSE : {response}");
+                return response;
             }
             else
             {
                 return "The connection is closed";
             }
+        }
+
+        public void SignIn(string username, string password)
+        {
+            Send($"/signin {username} {password}");
+        }
+
+        public void SignUp(string username, string password)
+        {
+            Send($"/signup {username} {password}");
+        }
+
+        public void SignOut()
+        {
+            Send($"/signout");
+        }
+
+        public void SendToRoom(string room, string message)
+        {
+            Send($"/sendtoroom {room} {message}");
+        }
+
+        public void NewUser(string username, string password)
+        {
+            Send($"/newuser {username} {password}");
+        }
+
+        public void UserList()
+        {
+            Send($"/userlist");
+        }
+
+        public void Invite(string username)
+        {
+            Send($"/invite {username}");
+        }
+
+        public void SetPassword(string username, string oldPassword, string newPassword)
+        {
+            Send($"/setpassword {username} {oldPassword} {newPassword}");
+        }
+
+        public void NewRoom(string room)
+        {
+            Send($"/newroom {room}");
+        }
+
+        public void Join(string room)
+        {
+            Send($"/join {room}");
+        }
+
+        public void RoomList()
+        {
+            Send($"/roomList");
         }
     }
 }

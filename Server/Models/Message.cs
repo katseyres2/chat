@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server
+namespace Server.Models
 {
     internal class Message
     {
@@ -13,7 +13,7 @@ namespace Server
         private string content;
         private DateTime? createdAt;
 
-        public Message(User author, string subject, string content) 
+        public Message(User author, string subject, string content)
         {
             this.author = author;
             this.subject = subject;

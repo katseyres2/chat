@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace Server
+namespace Server.Models
 {
     internal class User
     {
@@ -13,7 +13,7 @@ namespace Server
         private string password;
         private ChatRoom? currentRoom;
 
-        public string Username {get { return username; }}
+        public string Username { get { return username; } }
         public ChatRoom? CurrentRoom { get { return currentRoom; } }
         public NetworkStream? Stream { get { return client?.GetStream(); } }
 
@@ -40,6 +40,7 @@ namespace Server
 
         public string SendToClientListener(string message)
         {
+            Console.WriteLine($"SEND : {message}");
             if (IsClientListenerOpened())
             {
                 byte[] data = Encoding.ASCII.GetBytes(message);
@@ -68,6 +69,7 @@ namespace Server
         /// create a new user
         public User(string username, string password)
         {
+            Server.chatRooms.Add(new ChatRoom($"_{username}", this));
             this.username = username;
             this.password = password;
         }

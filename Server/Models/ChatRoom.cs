@@ -1,11 +1,10 @@
-﻿namespace Server
+﻿namespace Server.Models
 {
     internal class ChatRoom
     {
         private User admin;
         private string name;
         private readonly List<User> users = new() { };
-        //private readonly List<Message> messages = new () { };
 
         public string Name { get { return name; } }
 
@@ -14,7 +13,7 @@
         {
             return $"name : {name}, admin : {admin.Username}, users : {users.Count}";
         }
-        
+
         public ChatRoom(string name, User admin)
         {
             this.admin = admin;

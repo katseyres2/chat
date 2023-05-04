@@ -32,7 +32,7 @@ namespace Chat
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "17:00:01",
             "max",
             "Hello !"}, -1);
@@ -224,6 +224,7 @@ namespace Chat
             this.tabControl1.Size = new System.Drawing.Size(753, 486);
             this.tabControl1.TabIndex = 1;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.TabIndexChanged += new System.EventHandler(this.tabControl1_TabIndexChanged);
             // 
             // tabPage2
             // 
@@ -251,7 +252,7 @@ namespace Chat
             this.listView1.HideSelection = false;
             this.listView1.HoverSelection = true;
             this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
+            listViewItem1});
             this.listView1.Location = new System.Drawing.Point(-4, 0);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
