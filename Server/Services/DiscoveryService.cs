@@ -11,6 +11,11 @@ namespace Server.Services
 {
     internal class DiscoveryService
     {
+        /// <summary>
+        /// Find a user who a link with this client.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="user"></param>
         public static void FindUserByTcp(TcpClient client, ref User? user)
         {
             foreach (User? u in Models.Server.users)
@@ -25,6 +30,11 @@ namespace Server.Services
             user = null;
         }
 
+        /// <summary>
+        /// Find a room which has this name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="room"></param>
         public static void FindRoomByName(string name, ref ChatRoom? room)
         {
             foreach (ChatRoom cr in Models.Server.chatRooms)
@@ -59,11 +69,19 @@ namespace Server.Services
             user = null;
         }
 
+        /// <summary>
+        /// Count all server users.
+        /// </summary>
+        /// <returns></returns>
         public static int AllUserCounter()
         {
             return Models.Server.users.Count;
         }
 
+        /// <summary>
+        /// Count all connected server users.
+        /// </summary>
+        /// <returns></returns>
         public static int ConnectedUserCounter()
         {
             int counter = 0;
@@ -76,6 +94,12 @@ namespace Server.Services
             return counter;
         }
 
+        /// <summary>
+        /// Return an array of classes inside of this namespace.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <param name="nameSpace"></param>
+        /// <returns></returns>
         public static Type[] GetTypeInNameSpace(Assembly assembly, string nameSpace)
         {
             return assembly.GetTypes().Where(t => string.Equals(t.Namespace, nameSpace, StringComparison.Ordinal)).ToArray();

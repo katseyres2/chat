@@ -16,11 +16,20 @@ namespace Chat
 
         public Client() {}
 
+        /// <summary>
+        /// Connect your object to the server on the specific.
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="serverPort"></param>
         public void Connect(string server, int serverPort)
         {
             client = new TcpClient(server, serverPort);
         }
 
+        /// <summary>
+        /// Break the bound between your client service and the server.
+        /// It only stops one direction (client -> server).
+        /// </summary>
         public void Disconnect()
         {
             Send("/disconnect");
@@ -29,11 +38,30 @@ namespace Chat
             client = null;
         }
 
+        /// <summary>
+        /// Stop your listener service.
+        /// </summary>
+        public void StopListen()
+        {
+            listener.Stop();
+            listenerThread.Abort();
+            listener = null;
+        }
+
+        /// <summary>
+        /// Send ping request.
+        /// </summary>
         public void Ping()
         {
             Send("/ping");
         }
 
+        /// <summary>
+        /// Open a port to receive all data from outside.
+        /// You can receive here messages pushed from server to you.
+        /// </summary>
+        /// 
+        /// <param name="port"></param>
         public void StartListen(int port)
         {
             if (listener != null) return;
@@ -61,14 +89,11 @@ namespace Chat
             listenerThread.Start();
         }
 
-        public void StopListen()
-        {
-            listener.Stop();
-            Console.WriteLine(listenerThread.ThreadState);
-            listenerThread.Abort();
-            listener = null;
-        }
-
+        /// <summary>
+        /// Send a request to the server.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public string Send(string message)
         {
             Console.WriteLine($"SEND : {message}");
@@ -91,56 +116,103 @@ namespace Chat
             }
         }
 
+        /// <summary>
+        /// Send authentication request.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         public void SignIn(string username, string password)
         {
             Send($"/signin {username} {password}");
         }
 
+        /// <summary>
+        /// Send subscription request.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         public void SignUp(string username, string password)
         {
             Send($"/signup {username} {password}");
         }
 
+        /// <summary>
+        /// Send disconnection request.
+        /// </summary>
         public void SignOut()
         {
             Send($"/signout");
         }
 
+        /// <summary>
+        /// Send this message to this room.
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="message"></param>
         public void SendToRoom(string room, string message)
         {
             Send($"/sendtoroom {room} {message}");
         }
 
+        /// <summary>
+        /// Ask to create a new user.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         public void NewUser(string username, string password)
         {
             Send($"/newuser {username} {password}");
         }
 
+        /// <summary>
+        /// Ask to receive all users stored on the server.
+        /// </summary>
         public void UserList()
         {
             Send($"/userlist");
         }
 
+        /// <summary>
+        /// Invite a user in the room you currently are.
+        /// </summary>
+        /// <param name="username"></param>
         public void Invite(string username)
         {
             Send($"/invite {username}");
         }
 
+        /// <summary>
+        /// Ask to update the user password.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="oldPassword"></param>
+        /// <param name="newPassword"></param>
         public void SetPassword(string username, string oldPassword, string newPassword)
         {
             Send($"/setpassword {username} {oldPassword} {newPassword}");
         }
 
+        /// <summary>
+        /// Ask to create a new room.
+        /// </summary>
+        /// <param name="room"></param>
         public void NewRoom(string room)
         {
             Send($"/newroom {room}");
         }
 
+        /// <summary>
+        /// Ask to join this room
+        /// </summary>
+        /// <param name="room"></param>
         public void Join(string room)
         {
             Send($"/join {room}");
         }
 
+        /// <summary>
+        /// Ask to get all room you can access.
+        /// </summary>
         public void RoomList()
         {
             Send($"/roomList");

@@ -58,6 +58,9 @@ namespace Server.Models
             Console.WriteLine("Commands are filled.");
         }
 
+        /// <summary>
+        /// <br>Start the listener service. It accepts all outside connections and creates a new thread for each.</br>
+        /// </summary>
         public void run()
         {
             tcpListener.Start();
@@ -83,6 +86,9 @@ namespace Server.Models
             }
         }
 
+        /// <summary>
+        /// Add users in the server list to give access to the client.
+        /// </summary>
         public void populateData()
         {
             users.Add(new User("admin", "1234"));
@@ -92,6 +98,10 @@ namespace Server.Models
             chatRooms.Add(new ChatRoom("summer", users[1]));
         }
 
+        /// <summary>
+        /// <br>Handle each new connection with checks and responses.</br>
+        /// </summary>
+        /// <param name="client"></param>
         private void Handler(TcpClient client)
         {
             byte[] bytes;
@@ -109,9 +119,11 @@ namespace Server.Models
             stream = client.GetStream();
             Console.WriteLine($"New connection : {address}:{port}");
 
+            // start the loop which receives the messages and sends the responses.
             do
             {
                 bytes = new byte[256];
+                //TODO deprecated
                 response = ErrorMessage.CommandNotFound;
 
                 // read the incoming stream data
@@ -132,17 +144,6 @@ namespace Server.Models
 
                 // decode message
                 source = Encoding.UTF8.GetString(bytes);
-
-                if (source.Length == 0)
-                {
-                    // the message is empty
-                }
-
-                if (!ValidationService.isCommand(source))
-                {
-                    // the message doesn't start with a "/"
-                }
-
                 Console.WriteLine($"RECEIVED : {source}");
 
                 message = Regex.Replace(source.ToLower(), @"\b[ ]{2,}\b", " ");
@@ -165,6 +166,12 @@ namespace Server.Models
             } while (i != 0);
         }
 
+        /// <summary>
+        /// <br>Close the connection between the server(listener) and this client(client).</br>
+        /// </summary>
+        /// <param name="cli"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public string UnbindClient(TcpClient cli, string message)
         {
             User? user = null;
@@ -178,6 +185,11 @@ namespace Server.Models
             return ResponseMessage.SUCCESS;
         }
 
+        /// <summary>
+        /// Send this message to all private user rooms excepted the sender.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="message"></param>
         public static void Broadcast(TcpClient? source, string message)
         {
             User? userSource = null;
@@ -195,6 +207,12 @@ namespace Server.Models
             }
         }
 
+        /// <summary>
+        /// Send this message to this room.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="room"></param>
+        /// <param name="message"></param>
         public static void SendToChatRoom(TcpClient? source, ChatRoom room, string message)
         {
             User? userSource = null;
@@ -215,6 +233,11 @@ namespace Server.Models
             }
         }
 
+        /// <summary>
+        /// Respond to the sender on its private room.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="message"></param>
         public static void SendToUser(TcpClient? source, string message)
         {
             if (source == null) return;

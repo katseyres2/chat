@@ -60,13 +60,13 @@ namespace Server.Models
             return username.CompareTo("admin") == 0;
         }
 
-        /// check if the client is connected to this user
+        /// Check if the client is connected to this user.
         public bool HasSameTcpClientInstance(TcpClient client)
         {
             return client == this.client;
         }
 
-        /// create a new user
+        /// Create a new user.
         public User(string username, string password)
         {
             Server.chatRooms.Add(new ChatRoom($"_{username}", this));
@@ -75,7 +75,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// bind a client to this user
+        /// Bind a client to this user.
         /// </summary>
         /// <param name="cli"></param>
         public void BindClient(TcpClient cli)
@@ -85,7 +85,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// unbind the user client socket
+        /// Unbind the user client socket.
         /// </summary>
         /// <param name="c"></param>
         public void UnbindClient(TcpClient c)
@@ -95,7 +95,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// create a client listener instance for this user
+        /// Create a client listener instance for this user.
         /// </summary>
         /// <param name="address"></param>
         /// <param name="port"></param>
@@ -107,7 +107,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// stop the client listener instance for this user
+        /// Stop the client listener instance for this user.
         /// </summary>
         public void UnbindClientListener()
         {
@@ -118,7 +118,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// check if there is an opened session for this user
+        /// Check if there is an opened session for this user.
         /// </summary>
         /// <returns></returns>
         public bool IsClientOpened()
@@ -127,7 +127,7 @@ namespace Server.Models
         }
 
         /// <summary>
-        /// check if the client can receive notifications
+        /// Check if the client can receive notifications.
         /// </summary>
         /// <returns></returns>
         public bool IsClientListenerOpened()

@@ -1,5 +1,10 @@
 ﻿namespace Server.Models
 {
+    /// <summary>
+    /// <br>The chatroom is a group that hosts specific users.</br>
+    /// <br>By default, a private room is instanciated for each user.</br>
+    /// <br>Only users in this room can join it.</br>
+    /// </summary>
     internal class ChatRoom
     {
         private User admin;
@@ -21,11 +26,21 @@
             users.Add(admin);
         }
 
+        /// <summary>
+        /// Check if this user is the room administrator.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool IsAdmin(User user)
         {
             return user == admin;
         }
 
+        /// <summary>
+        /// Find if this is user is in this room.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool HasUser(User user)
         {
             foreach (User u in users)
@@ -39,6 +54,12 @@
             return false;
         }
 
+        /// <summary>
+        /// <br>Update the room name (admin right).</br>
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <param name="newName"></param>
+        /// <returns></returns>
         public bool SetName(User admin, string newName)
         {
             if (IsAdmin(admin))
@@ -50,6 +71,12 @@
             return false;
         }
 
+        /// <summary>
+        /// Add a this guest in this room (admin right).
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <param name="guest"></param>
+        /// <returns></returns>
         public bool Add(User admin, User guest)
         {
             if (IsAdmin(admin) && !HasUser(guest))
@@ -61,6 +88,12 @@
             return false;
         }
 
+        /// <summary>
+        /// Remove this guest from the room (admin right).
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <param name="guest"></param>
+        /// <returns></returns>
         public bool Kick(User admin, User guest)
         {
             if (IsAdmin(admin) && HasUser(guest))
@@ -72,6 +105,12 @@
             return false;
         }
 
+        /// <summary>
+        /// Change the admin user. The room can only have 1 admin. (admin right)
+        /// </summary>
+        /// <param name="oldAdmin"></param>
+        /// <param name="newAdmin"></param>
+        /// <returns></returns>
         public bool TransferOwnership(User oldAdmin, User newAdmin)
         {
             if (IsAdmin(oldAdmin))
@@ -83,6 +122,9 @@
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Broadcast()
         {
             foreach (User u in users)
@@ -95,10 +137,5 @@
                 }
             }
         }
-
-        //public bool send(Message message)
-        //{
-        //    foreach ()
-        //}
     }
 }

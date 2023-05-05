@@ -25,13 +25,19 @@ namespace Server.Commands
 
             string name = args[1];
 
+            // check if the room only contains specific characters
             if (!Regex.Match(name, "/b^[0-9a-zA-Z]*$/b").Success) 
             {
                 Models.Server.SendToUser(client, ErrorMessage.UserAlreadyExists);
             }
 
             DiscoveryService.FindRoomByName(name, ref room);
-            if (room != null) Models.Server.SendToUser(client, ErrorMessage.NameAlreadyExists);
+            
+            if (room != null)
+            {
+                Models.Server.SendToUser(client, ErrorMessage.NameAlreadyExists);
+                return;
+            }
 
             DiscoveryService.FindUserByTcp(client, ref user);
             
@@ -42,6 +48,7 @@ namespace Server.Commands
             }
 
             room = new(name, user);
+            
             Models.Server.chatRooms.Add(room);
             Models.Server.SendToUser(client, $"The room \"{name}\" appears.");
         }

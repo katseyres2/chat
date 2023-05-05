@@ -23,12 +23,4 @@ namespace Server.Constants
         public const string PermissionDenied = "PermissionDenied";
         public const string CommandNotFound = "CommandNotFound";
     }
-
-
-
-
-    internal class MessageConstant
-    {
-
-    }
 }
