@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+
+using Server.Exceptions;
 using Server.Models;
 
 namespace Server.Services
@@ -39,7 +41,7 @@ namespace Server.Services
         {
             foreach (ChatRoom cr in Models.Server.chatRooms)
             {
-                if (cr.Name == name)
+                if (cr.Name.CompareTo(name) == 0)
                 {
                     room = cr;
                     return;
@@ -58,7 +60,6 @@ namespace Server.Services
         {
             foreach (User u in Models.Server.users)
             {
-                Console.WriteLine($"{username}:{u.Username} = {u.Username.CompareTo(username) == 0}");
                 if (u.Username.CompareTo(username) == 0)
                 {
                     user = u;

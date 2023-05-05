@@ -44,7 +44,7 @@ namespace Server.Commands
                 return;
             }
             
-            Models.Server.SendToChatRoom(client, room, "has joined");
+            //Models.Server.SendToChatRoom(client, room, "has joined");
             user.SwitchRoom(room);
         }
     }

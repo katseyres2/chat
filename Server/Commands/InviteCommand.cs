@@ -46,20 +46,23 @@ namespace Server.Commands
                 return;
             } 
 
-            user.CurrentRoom.Add(user, guest);
-
-            foreach (ChatRoom cr in Models.Server.chatRooms)
-            {   
-                if (cr == user.CurrentRoom)
-                {
-                    if (cr.Add(user, guest))
-                    {
-                        Models.Server.SendToUser(client, ErrorMessage.Error);
-                    }
-                }
+            if (user.CurrentRoom.HasUser(guest))
+            {
+                Models.Server.SendToUser(client, ErrorMessage.UserAlreadyJoined);
+                return;
             }
 
-            Models.Server.SendToUser(client, "user invited !");
+            if (!user.CurrentRoom.IsAdmin(user))
+            {
+                Models.Server.SendToUser(client, ErrorMessage.PermissionDenied);
+                return;
+            }
+
+            user.CurrentRoom.Add(user, guest);
+            Models.Server.SendToUser(client, $"The user {guest.Username} has joined the room.");
+
+            if (guest.IsClientOpened())
+                Models.Server.SendToUser(guest.GetTcpClient(), $"room {user.CurrentRoom.Name}");
         }
     }
 }

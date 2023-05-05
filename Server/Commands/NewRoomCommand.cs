@@ -11,9 +11,9 @@ using Server.Constants;
 
 namespace Server.Commands
 {
-    internal class CreateRoomCommand : Command
+    internal class NewRoomCommand : Command
     {
-        public CreateRoomCommand() : base("/newroom", "New room.") { }
+        public NewRoomCommand() : base("/newroom", "New room.") { }
 
         public override void Execute(TcpClient client, string message)
         {
@@ -50,7 +50,7 @@ namespace Server.Commands
             room = new(name, user);
             
             Models.Server.chatRooms.Add(room);
-            Models.Server.SendToUser(client, $"The room \"{name}\" appears.");
+            Models.Server.SendToUser(client, $"room {room.Name}");
         }
     }
 }

@@ -11,6 +11,8 @@ using System.Windows.Forms;
 
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
+using ListView = System.Windows.Forms.ListView;
+
 namespace Chat
 {
     public partial class Form1 : Form
@@ -28,17 +30,60 @@ namespace Chat
 
         void HandleApplicationIdle(object sender, EventArgs e)
         {
-            string message;
-            string username;
+            string key, value, username, data, roomName, message;
             string[] parameters;
             int index;
 
             while (remoteMessageQueue.Count > 0)
             {
                 index = remoteMessageQueue.Count - 1;
-                message = remoteMessageQueue[index];
+                data = remoteMessageQueue[index];
+                parameters = data.Split(' ');
 
-                Console.WriteLine($"IN : {message}");
+                username = parameters.Length > 1  ? parameters[1] : "";
+                roomName = parameters.Length > 2  ? parameters[2] : "";
+                key = parameters.Length > 3       ? parameters[3] : "";
+                value = parameters.Length > 4     ? parameters[4] : "";
+
+                Console.WriteLine($"IN : {data} ; key={key} ; value={value} ; roomName={roomName} ; username={username}");
+
+                if (key.CompareTo("connectedusercounter") == 0)
+                {
+                    UpdateConnectedUserCounter(int.Parse(value));
+                    label7.Text = username;
+                    EnableUser();
+                    DisableAuthenticationForm();
+                    textBox5.Text = textBox4.Text = "";
+                    button4.Text = "Sign Out";
+                    
+                    label8.Enabled = label14.Enabled 
+                        = button6.Enabled = comboBox2.Enabled 
+                        = button5.Enabled = comboBox1.Enabled 
+                        = button7.Enabled = true;
+
+                    if (username.CompareTo("admin") == 0) EnableAdmin();
+                }
+                else if (key.CompareTo("allusercounter") == 0) UpdateAllUserCounter(int.Parse(value));
+                else if (key.CompareTo("room") == 0) AddRoom(value);
+                else if (key.CompareTo("user") == 0)
+                {
+                    comboBox1.Items.Add(value);
+                    comboBox2.Items.Add(value);
+                }
+                else
+                {
+                    message = "";
+
+                    for (int i = 3; i < parameters.Length; i++)
+                    {
+                        message += $"{parameters[i]} ";
+                    }
+
+                    DisplayServerMessage(username, roomName, message);
+                }
+
+
+                //DisplayServerMessage(username, message);
 
                 //if (message.Contains("allusercounter")) updateAllUserCounter(int.Parse(message.Split(' ')[3]));
                 //else if (message.Contains("connectedusercounter")) updateConnectedUserCounter(int.Parse(message.Split(' ')[3]));
@@ -63,12 +108,66 @@ namespace Chat
             }
         }
 
-        private void updateAllUserCounter(int counter)
+        private void AddRoom(string name)
+        {
+            TabPage tb = buildTabPage(name);
+            tabControl1.Controls.Add(tb);
+        }
+
+        private static TabPage buildTabPage(string name)
+        {
+            TabPage tb = new TabPage();
+            tb.Location = new Point(4, 22);
+            tb.Name = name;
+            tb.Padding = new Padding(3);
+            tb.Size = new Size(745, 460);
+            tb.TabIndex = 1;
+            tb.Text = name;
+            tb.UseVisualStyleBackColor = true;
+            tb.Controls.Add(buildListView(name));
+
+            return tb;
+        }
+
+        private static ListView buildListView(string name)
+        {
+            var hour = new ColumnHeader();
+            var user = new ColumnHeader();
+            var message = new ColumnHeader();
+
+            hour.Text = "Hour";
+            user.Text = "User";
+            user.Width = 100;
+            message.Text = "Message";
+            message.Width = 580;
+
+            var lv = new ListView();
+            lv.Activation = ItemActivation.OneClick;
+            lv.Alignment = ListViewAlignment.SnapToGrid;
+            lv.AutoArrange = false;
+            lv.BorderStyle = BorderStyle.None;
+            lv.Columns.AddRange(new ColumnHeader[] { hour, user, message});
+            lv.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            lv.HideSelection = false;
+            lv.HoverSelection = true;
+            lv.Location = new Point(-4, 0);
+            lv.MultiSelect = false;
+            lv.Name = name;
+            lv.ShowGroups = false;
+            lv.Size = new Size(753, 464);
+            lv.TabIndex = 1;
+            lv.UseCompatibleStateImageBehavior = false;
+            lv.View = View.Details;
+
+            return lv;
+        }
+
+        private void UpdateAllUserCounter(int counter)
         {
             label24.Text = counter.ToString();
         }
 
-        private void updateConnectedUserCounter(int counter)
+        private void UpdateConnectedUserCounter(int counter)
         {
             label23.Text = counter.ToString();
         }
@@ -94,7 +193,7 @@ namespace Chat
             string response;
             string username = textBox4.Text;
             string password = textBox5.Text;
-            int localPort = int.Parse(textBox7.Text);
+            int localPort = (new Random()).Next(1234, 2000);
 
             if (button4.Text.ToLower().CompareTo("sign in") == 0)
             {
@@ -103,110 +202,93 @@ namespace Chat
                 client.StartListen(localPort);
                 Console.WriteLine($"Listen on {localPort}");
                 // then send credentials with the port the client is listening with.
-                message = $"/signin {username} {password} {localPort}";
-                response = client.Send(message);
-                label12.Text = response;
-
-                if (response == SUCCESS_RESPONSE)
-                {
-                    label7.Text = username;
-                    EnableUser();
-                    DisableAuthenticationForm();
-                    textBox5.Text = textBox4.Text = "";
-                    button4.Text = "Sign Out";
-                    if (username.CompareTo("admin") == 0) EnableAdmin();
-                    displayServerMessage(null, $"Signed as {username}.");
-                    FetchRooms();
-                }
-
+                client.SignIn(username, password, localPort);
                 Console.WriteLine("End signin");
             }
             else
             {
                 // send to the server that he can stop its TcpClient for the local listener
-                response = client.Send($"/signout");
+                client.SignOut();
                 //then stop the local listener
                 client.StopListen();
 
-                label12.Text = response;
-                displayServerMessage(null, "Signed out.");
                 button4.Text = "Sign in";
                 label7.Text = "";
+                button5.Enabled = comboBox1.Enabled = button7.Enabled = false;
 
                 clearInputs();
                 DisableConfigurationPanel();
                 EnableAuthenticationForm();
-                //removeRooms();
+                RemoveRooms();
             }
         }
 
-        private void removeRooms()
+        private void RemoveRooms()
         {
             foreach (TabPage tb in tabControl1.TabPages)
             {
-                if (tb.Name == "private") continue;
                 tabControl1.TabPages.Remove(tb);
             }
         }
 
-        private void FetchRooms()
-        {
-            TabPage tabPage;
-            string response = client.Send("/roomlist");
+        //private void FetchRooms()
+        //{
+        //    TabPage tabPage;
+        //    string response = client.Send("/roomlist");
 
-            string[] args = response.Split(' ');
+        //    string[] args = response.Split(' ');
 
-            for (int i = 1; i < args.Length; i++)
-            {
-                ListViewItem li = new ListViewItem(new string[] {"17:00:01","max","Hello !"}, -1);
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        ListViewItem li = new ListViewItem(new string[] {"17:00:01","max","Hello !"}, -1);
 
-                ColumnHeader newHour = new ColumnHeader();
-                newHour.Text = "Hour";
-                ColumnHeader newUser = new ColumnHeader();
-                user.Text = "User";
-                user.Width = 100;
-                ColumnHeader newMessage = new ColumnHeader();
-                message.Text = "Message";
-                message.Width = 577;
+        //        ColumnHeader newHour = new ColumnHeader();
+        //        newHour.Text = "Hour";
+        //        ColumnHeader newUser = new ColumnHeader();
+        //        user.Text = "User";
+        //        user.Width = 100;
+        //        ColumnHeader newMessage = new ColumnHeader();
+        //        message.Text = "Message";
+        //        message.Width = 577;
 
-                System.Windows.Forms.ListView lv = new System.Windows.Forms.ListView();
-                lv.Activation = ItemActivation.OneClick;
-                lv.Alignment = ListViewAlignment.SnapToGrid;
-                lv.AutoArrange = false;
-                lv.BorderStyle = BorderStyle.None;
-                lv.Columns.AddRange(new ColumnHeader[] {newHour,newUser,newMessage});
-                lv.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-                lv.HideSelection = false;
-                lv.HoverSelection = true;
-                lv.Items.AddRange(new ListViewItem[] {li});
-                lv.Location = new Point(-4, 0);
-                lv.MultiSelect = false;
-                lv.ShowGroups = false;
-                lv.Size = new Size(753, 464);
-                lv.TabIndex = tabControl1.TabCount + 1;
-                lv.UseCompatibleStateImageBehavior = false;
-                lv.View = View.Details;
-                //lv.SelectedIndexChanged += new EventHandler((object sender, EventArgs e) => {
-                //    Console.WriteLine(tabControl1.);
-                //});
+        //        System.Windows.Forms.ListView lv = new System.Windows.Forms.ListView();
+        //        lv.Activation = ItemActivation.OneClick;
+        //        lv.Alignment = ListViewAlignment.SnapToGrid;
+        //        lv.AutoArrange = false;
+        //        lv.BorderStyle = BorderStyle.None;
+        //        lv.Columns.AddRange(new ColumnHeader[] {newHour,newUser,newMessage});
+        //        lv.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+        //        lv.HideSelection = false;
+        //        lv.HoverSelection = true;
+        //        lv.Items.AddRange(new ListViewItem[] {li});
+        //        lv.Location = new Point(-4, 0);
+        //        lv.MultiSelect = false;
+        //        lv.ShowGroups = false;
+        //        lv.Size = new Size(753, 464);
+        //        lv.TabIndex = tabControl1.TabCount + 1;
+        //        lv.UseCompatibleStateImageBehavior = false;
+        //        lv.View = View.Details;
+        //        //lv.SelectedIndexChanged += new EventHandler((object sender, EventArgs e) => {
+        //        //    Console.WriteLine(tabControl1.);
+        //        //});
 
-                Console.WriteLine(args[i]);
-                tabPage = new TabPage();
-                tabPage.Text = args[i];
-                tabPage.Name = args[i];
-                tabControl1.Controls.Add(tabPage);
-                tabPage.Controls.Add(lv);
-            }
-        }
+        //        Console.WriteLine(args[i]);
+        //        tabPage = new TabPage();
+        //        tabPage.Text = args[i];
+        //        tabPage.Name = args[i];
+        //        tabControl1.Controls.Add(tabPage);
+        //        tabPage.Controls.Add(lv);
+        //    }
+        //}
 
         private void EnableConnectionForm()
         {
-            textBox2.Enabled = textBox1.Enabled = textBox7.Enabled = true;
+            textBox2.Enabled = textBox1.Enabled = true;
         }
 
         private void DisableConnectionForm()
         {
-            textBox2.Enabled = textBox1.Enabled = textBox7.Enabled = false;
+            textBox2.Enabled = textBox1.Enabled = false;
         }
 
 
@@ -281,18 +363,18 @@ namespace Chat
             {
                 // connect the client to the server on [address:port]
                 client.Connect(address, port);
-                displayServerMessage(null, "Connected.");
+                //DisplayServerMessage(null, "Connected.");
                 DisableConnectionForm();
             }
             else
             {                
                 // then you can close the client
                 client.Disconnect();
-                displayServerMessage(null, "Disconnected.");
+                //DisplayServerMessage(null, "Disconnected.");
                 EnableConnectionForm();
             }
             
-            button7.Enabled = button4.Enabled = textBox5.Enabled = textBox4.Enabled = !textBox4.Enabled;
+            button4.Enabled = textBox5.Enabled = textBox4.Enabled = !textBox4.Enabled;
 
             if (button1.Text.CompareTo("Connect") == 0)
             {
@@ -340,7 +422,6 @@ namespace Chat
         }
 
         private void button2_MouseDown(object sender, MouseEventArgs e)
-
         {
             string msg = textBox3.Text;
 
@@ -348,13 +429,13 @@ namespace Chat
             {
                 textBox3.Text = "";
                 msg = msg.TrimStart('/');
-                client.Send($"/messagetochannel {tabControl1.SelectedTab.Name} {msg}");
+                client.SendToRoom(tabControl1.SelectedTab.Name, msg);
             }
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Console.WriteLine(listView1.TabIndex);
+
         }
 
         private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
@@ -365,20 +446,33 @@ namespace Chat
             }
         }
 
+        private static bool IsEnterKeyboard(char c)
+        {
+            return Convert.ToInt32(c) == 13;
+        }
+
         private void button7_Click(object sender, EventArgs e)
         {
             client.Ping();
             //if (client.Ping() == SUCCESS_RESPONSE) displayServerMessage(null,"Pong !");
         }
 
-        public void displayServerMessage(string username, string msg)
+        public void DisplayServerMessage(string username, string roomName, string msg)
         {
-            if (username == null) username = "server";
             if (username.Length > 15) username = username.Substring(0, 15);
 
             ListViewItem lvi = new ListViewItem(new string[] {DateTime.Now.ToShortTimeString(), username, msg}, -1);
-            if (username == "server") lvi.ForeColor = Color.Orange;
-            listView1.Items.Insert(0, lvi);
+
+            foreach (TabPage tb in tabControl1.TabPages)
+            {
+                if (tb.Name.CompareTo(roomName) == 0)
+                {
+
+                    var elems = tb.Controls.Find(roomName, true);
+                    var lv = (ListView)elems[0];
+                    lv.Items.AddRange(new ListViewItem[] { lvi });
+                }
+            }
         }
 
         private void label16_Click(object sender, EventArgs e)
@@ -403,9 +497,8 @@ namespace Chat
             {
                 return;
             }
-
-            response = client.Send($"/newuser {username} {password}");
-            displayServerMessage(null,response);
+            
+            client.NewUser(username, password);
         }
 
         private void clearInputs()
@@ -421,19 +514,50 @@ namespace Chat
             string username = textBox10.Text;
             string password = textBox11.Text;
 
-            if (username.Length != 0 && password.Length != 0) client.Send($"/setpassword {username} {password}");
+            if (username.Length != 0 && password.Length != 0) client.SetPassword(username, password);
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             TabControl control = (TabControl) sender;
-            Console.WriteLine($"changed : {control.SelectedIndex}, {control.SelectedTab.Name}");
-            //Console.WriteLine(control.SelectedIndex + ", " + control.SelectedTab.Name);
+
+            if (control.SelectedTab != null)
+            {
+                Console.WriteLine($"changed : {control.SelectedIndex}, {control.SelectedTab.Name}");
+                client.Join(control.SelectedTab.Name);
+            }
         }
 
         private void tabControl1_TabIndexChanged(object sender, EventArgs e)
         {
             Console.WriteLine($"TabIndex changed {tabControl1.TabIndex}, {tabControl1.SelectedIndex}");
+        }
+
+        private void EventCreateRoom(object sender, MouseEventArgs e)
+        {
+            client.NewRoom(textBox6.Text);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            client.Invite(comboBox1.Text);
+        }
+
+        private void textBox6_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (IsEnterKeyboard(e.KeyChar))
+                EventCreateRoom(sender, null);
+        }
+
+        private void button5_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (IsEnterKeyboard(e.KeyChar))
+                button5_Click(sender, null);
+        }
+
+        private void button6_MouseClick(object sender, MouseEventArgs e)
+        {
+            client.Kick(comboBox2.Text);
         }
     }
 }

@@ -94,7 +94,7 @@ namespace Chat
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public string Send(string message)
+        private string Send(string message)
         {
             Console.WriteLine($"SEND : {message}");
             if (client != null)
@@ -103,7 +103,7 @@ namespace Chat
                 byte[] data = Encoding.ASCII.GetBytes(message);
                 client.GetStream().Write(data, 0, data.Length);
                 Console.WriteLine(2);
-                data = new byte[2048];
+                data = new byte[4096];
                 int bytes = client.GetStream().Read(data, 0, data.Length);
                 Console.WriteLine(3);
                 string response = Encoding.ASCII.GetString(data, 0, bytes);
@@ -116,14 +116,19 @@ namespace Chat
             }
         }
 
+        public void Kick(string username)
+        {
+            Send($"/kick {username}");
+        }
+
         /// <summary>
         /// Send authentication request.
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
-        public void SignIn(string username, string password)
+        public void SignIn(string username, string password, int localPort)
         {
-            Send($"/signin {username} {password}");
+            Send($"/signin {username} {password} {localPort}");
         }
 
         /// <summary>
@@ -151,6 +156,7 @@ namespace Chat
         /// <param name="message"></param>
         public void SendToRoom(string room, string message)
         {
+            Console.WriteLine($"BEFORE SEND : {message}");
             Send($"/sendtoroom {room} {message}");
         }
 
@@ -187,9 +193,9 @@ namespace Chat
         /// <param name="username"></param>
         /// <param name="oldPassword"></param>
         /// <param name="newPassword"></param>
-        public void SetPassword(string username, string oldPassword, string newPassword)
+        public void SetPassword(string username, string newPassword)
         {
-            Send($"/setpassword {username} {oldPassword} {newPassword}");
+            Send($"/setpassword {username} {newPassword}");
         }
 
         /// <summary>

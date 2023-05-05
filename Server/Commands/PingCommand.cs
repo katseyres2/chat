@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Server.Models;
+using Server.Services;
 
 namespace Server.Commands
 {
@@ -14,7 +15,11 @@ namespace Server.Commands
 
         public override void Execute(TcpClient client, string message)
         {
-            Models.Server.SendToUser(client, message);
+            User? user = null;
+            ChatRoom? room = null;
+            DiscoveryService.FindUserByTcp(client, ref user);          
+
+            Models.Server.SendToChatRoom(client, user!.CurrentRoom!,  "pong");
         }
     }
 }

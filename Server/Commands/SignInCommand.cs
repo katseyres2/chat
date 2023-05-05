@@ -66,6 +66,12 @@ namespace Server.Commands
             Models.Server.Broadcast(client, $"Is connected.");
             Models.Server.Broadcast(null, $"allusercounter {DiscoveryService.AllUserCounter()}");
             Models.Server.Broadcast(null, $"connectedusercounter {DiscoveryService.ConnectedUserCounter()}");
+
+            foreach (ChatRoom cr in Models.Server.chatRooms)
+                if (cr.HasUser(user)) Models.Server.SendToUser(client, $"room {cr.Name}");
+
+            foreach (User u in Models.Server.users)
+                if (u.Username.CompareTo(user.Username) != 0) Models.Server.SendToUser(client, $"user {u.Username}");
         }
     }
 }

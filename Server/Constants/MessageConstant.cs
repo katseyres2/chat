@@ -9,6 +9,7 @@ namespace Server.Constants
     public static class ErrorMessage
     {
         public const string UserAlreadyExists = "UserAlreadyExists";
+        public const string UserAlreadyJoined= "UserAlreadyJoined";
         public const string UserNotFound = "UserNotFound";
         public const string GuestNotFound = "GuestNotFound";
         public const string WrongCredentials = "WrongCredentials";

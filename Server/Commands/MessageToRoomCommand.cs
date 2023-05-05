@@ -13,7 +13,7 @@ namespace Server.Commands
 {
     internal class MessageToRoomCommand : Command
     {
-        public MessageToRoomCommand() : base("/messagetochannel", "Close the user session.") { }
+        public MessageToRoomCommand() : base("/sendtoroom", "Close the user session.") { }
 
         public override void Execute(TcpClient client, string message)
         {

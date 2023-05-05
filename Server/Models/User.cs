@@ -11,10 +11,11 @@ namespace Server.Models
         private TcpClient? clientListener;
         private readonly string username;
         private string password;
-        private ChatRoom? currentRoom;
+        private ChatRoom currentRoom;
 
+        public TcpClient? GetTcpClient() { return client;  }
         public string Username { get { return username; } }
-        public ChatRoom? CurrentRoom { get { return currentRoom; } }
+        public ChatRoom CurrentRoom { get { return currentRoom; } }
         public NetworkStream? Stream { get { return client?.GetStream(); } }
 
         public bool HasSameCredentials(string username, string password)
@@ -69,7 +70,9 @@ namespace Server.Models
         /// Create a new user.
         public User(string username, string password)
         {
-            Server.chatRooms.Add(new ChatRoom($"_{username}", this));
+            ChatRoom cr = new ChatRoom($"_{username}", this);
+            Server.chatRooms.Add(cr);
+            currentRoom = cr;
             this.username = username;
             this.password = password;
         }

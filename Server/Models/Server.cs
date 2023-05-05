@@ -95,7 +95,10 @@ namespace Server.Models
             users.Add(new User("max", "1234"));
             chatRooms.Add(new ChatRoom("spring", users[0]));
             chatRooms.Add(new ChatRoom("winter", users[0]));
-            chatRooms.Add(new ChatRoom("summer", users[1]));
+            var summer = new ChatRoom("summer", users[1]);
+            summer.Add(users[1], users[0]);
+            chatRooms.Add(summer);
+            
         }
 
         /// <summary>
@@ -146,12 +149,12 @@ namespace Server.Models
                 source = Encoding.UTF8.GetString(bytes);
                 Console.WriteLine($"RECEIVED : {source}");
 
-                message = Regex.Replace(source.ToLower(), @"\b[ ]{2,}\b", " ");
-                command = message.Split(' ')[0].ToLower();
+                message = Regex.Replace(source, @"\b[ ]{2,}\b", " ");
+                command = message.Split(' ')[0];
 
                 foreach (Command cmd in commands)
                 {
-                    if (cmd.name.CompareTo(command.ToLower()) == 0)
+                    if (cmd.name.CompareTo(command) == 0)
                     {
                         cmd.Execute(client, message);
                     }
@@ -162,7 +165,12 @@ namespace Server.Models
                 // encode message
                 byte[] msg = Encoding.UTF8.GetBytes(response);
                 // send response to client
-                stream.Write(msg, 0, msg.Length);
+
+
+                if (client.Connected)
+                    stream.Write(msg, 0, msg.Length);
+                else
+                    break;
             } while (i != 0);
         }
 

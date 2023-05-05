@@ -13,7 +13,7 @@ namespace Server.Services
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static bool isCommand(string value)
+        public static bool IsCommand(string value)
         {
             return value.Length > 0 && value[0].CompareTo('/') == 0;
         }

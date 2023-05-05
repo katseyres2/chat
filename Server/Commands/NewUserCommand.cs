@@ -17,9 +17,10 @@ namespace Server.Commands
 
         public override void Execute(TcpClient client, string message)
         {
-            User? modifier = null;
-            User? user = null;
+            User? source = null;
+            User? newUser = null;
             string[] args = message.Trim().Split(' ');
+            
             if (args.Length != 3)
             {
                 Models.Server.SendToUser(client, ErrorMessage.InvalidParameter);
@@ -29,30 +30,30 @@ namespace Server.Commands
             string username = args[1];
             string password = args[2];
 
-            DiscoveryService.FindUserByTcp(client, ref modifier);
+            DiscoveryService.FindUserByTcp(client, ref source);
             
-            if (modifier == null)
+            if (source == null)
             {
                 Models.Server.SendToUser(client, ErrorMessage.UserNotFound);
                 return;
             }
 
-            if (!modifier.IsAdmin())
+            if (!source.IsAdmin())
             {
                 Models.Server.SendToUser(client, ErrorMessage.PermissionDenied);
                 return;
             }
 
-            DiscoveryService.FindUserByName(username, ref user);
+            DiscoveryService.FindUserByName(username, ref newUser);
 
-            if (user != null)
+            if (newUser != null)
             {
                 Models.Server.SendToUser(client, ErrorMessage.UserAlreadyExists);
                 return;
             }
 
             Models.Server.users.Add(new User(username, password));
-            Models.Server.Broadcast(client, $"Has created the user {username}.");
+            Models.Server.Broadcast(null, $"user {username}");
         }
     }
 }
