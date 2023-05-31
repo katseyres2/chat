@@ -16,7 +16,6 @@ namespace Server.Commands
         public override void Execute(TcpClient client, string message)
         {
             User? user = null;
-            ChatRoom? room = null;
             DiscoveryService.FindUserByTcp(client, ref user);          
 
             Models.Server.SendToChatRoom(client, user!.CurrentRoom!,  "pong");

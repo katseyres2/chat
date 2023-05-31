@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Server.Models
 {
-    internal class User
+    public class User
     {
         // the socket through the client is connected
         private TcpClient? client;

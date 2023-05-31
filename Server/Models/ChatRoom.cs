@@ -5,7 +5,7 @@
     /// <br>By default, a private room is instanciated for each user.</br>
     /// <br>Only users in this room can join it.</br>
     /// </summary>
-    internal class ChatRoom
+    public class ChatRoom
     {
         private User admin;
         private string name;

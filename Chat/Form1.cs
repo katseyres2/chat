@@ -189,8 +189,8 @@ namespace Chat
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string message;
-            string response;
+            //string message;
+            //string response;
             string username = textBox4.Text;
             string password = textBox5.Text;
             int localPort = (new Random()).Next(1234, 2000);
@@ -487,7 +487,7 @@ namespace Chat
 
         private void button8_Click(object sender, EventArgs e)
         {
-            string response;
+            //string response;
             string username = textBox8.Text;
             string password = textBox9.Text;
 

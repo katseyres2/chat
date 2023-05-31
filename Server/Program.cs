@@ -7,9 +7,9 @@ namespace Server
         static void Main()
         {
             Models.Server s = new Models.Server(Models.Server.LOCAL_HOST, Models.Server.LOCAL_PORT);
-            s.populateCommands();
-            s.populateData();
-            s.run();
+            s.PopulateCommands();
+            s.PopulateData();
+            s.Run();
         }
     }
 }

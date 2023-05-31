@@ -40,7 +40,7 @@ namespace Server.Models
         /// Populate commands List dynamically with all Command in the namespace Server.Commands.
         /// The namespace Server.Commands must only have Command inherited object.
         /// </summary>
-        public void populateCommands()
+        public void PopulateCommands()
         {
             Console.WriteLine("Start populate commands.");
             // Fetch all classes included in the namespace Server.Commands.
@@ -61,7 +61,7 @@ namespace Server.Models
         /// <summary>
         /// <br>Start the listener service. It accepts all outside connections and creates a new thread for each.</br>
         /// </summary>
-        public void run()
+        public void Run()
         {
             tcpListener.Start();
             Console.WriteLine($"Server started, listening on {host}:{port}...");
@@ -89,7 +89,7 @@ namespace Server.Models
         /// <summary>
         /// Add users in the server list to give access to the client.
         /// </summary>
-        public void populateData()
+        public void PopulateData()
         {
             users.Add(new User("admin", "1234"));
             users.Add(new User("max", "1234"));
