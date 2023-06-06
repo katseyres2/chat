@@ -1,5 +1,11 @@
 # Chat project
 
+Group :
+
+- Lazare K ASSIE
+- Maximilien DENIS
+- Alexandre Ernotte
+
 Message that the client can send :
 
 ```bash
